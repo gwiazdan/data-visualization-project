@@ -1,0 +1,1 @@
+Link to dataset: [kaggle.com/datasets/radosawsierny/](https://www.kaggle.com/datasets/radosawsierny/polish-lotto-dataset-19572021)
