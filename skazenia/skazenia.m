@@ -263,9 +263,12 @@ xtickangle(40);
 exportgraphics(f, '6.png', BackgroundColor='#f0efe9')
 close(f);
 
-%% Rozklady danych - histogramy
-figure(7);
-tiledlayout(2,2, 'TileSpacing', 'compact');
+%% Rozklady danych - histogramy (woda)
+f = figure(7);
+f.Position = [0 500 1200 600];
+f.Visible = "off";
+f.Theme = 'light';
+tiledlayout(2,1, 'TileSpacing', 'compact');
 
 nexttile;
 histogram(data.Cs137WodamBqL, 'NumBins', 20);
@@ -281,6 +284,13 @@ xlabel('Sr-90 w wodzie [mBq/L]', rotation=0, FontWeight='bold');
 ylabel('Liczba pomiarow', FontWeight='bold');
 title('Rozklad Sr-90 w wodzie');
 
+%% Rozklady danych - histogramy (osady)
+f = figure(7);
+f.Position = [0 500 1200 600];
+f.Visible = "off";
+f.Theme = 'light';
+tiledlayout(2,1, 'TileSpacing', 'compact');
+
 nexttile;
 histogram(data.Cs137OsadyBqKg, 'NumBins', 20);
 grid on;
@@ -294,6 +304,9 @@ grid on;
 xlabel('Pu-239+240 [mBq/kg]', rotation=0, FontWeight='bold');
 ylabel('Liczba pomiarow', FontWeight='bold');
 title('Rozklad Pu-239+240');
+
+exportgraphics(f, '7.png', BackgroundColor='#f0efe9')
+close(f);
 
 %% Macierz korelacji - wykres ciepla
 figure(8);
