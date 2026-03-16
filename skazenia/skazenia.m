@@ -140,7 +140,7 @@ mapMiasta = innerjoin(geoTable, miastaPelne, 'Keys', 'Miejscowosc');
 
 %% Wizualizacja trendow rocznych - w wodzie
 f = figure(2);
-f.Position = [0 500 1200 600];
+f.Position = [0 500 1500 600];
 f.Visible = "off";
 f.Theme = 'light';
 
@@ -151,7 +151,7 @@ plot(ax, roczne.Rok, roczne.mean_Sr90WodamBqL, '-o', 'LineWidth', 1.6, DisplayNa
 
 grid(ax, 'on');
 xlabel(ax, 'Rok', FontWeight='bold');
-ylabel(ax, 'Stężenie izotopów', rotation=0, FontWeight='bold');
+ylabel(ax, {'Stężenie','izotopów'}, rotation=0, FontWeight='bold');
 title(ax, 'Srednie roczne stężenie promieniotwórcze izotopów w wodzie', FontSize=16);
 legend(ax, Location='northwest');
 ax.Units = 'normalized';
@@ -162,7 +162,7 @@ close(f);
 
 %% Wizualizacja trendow rocznych - osady
 f = figure(3);
-f.Position = [0 500 1200 600];
+f.Position = [0 500 1500 600];
 f.Visible = "off";
 f.Theme = 'light';
 
@@ -174,7 +174,7 @@ plot(ax, roczne.Rok, roczne.mean_Pu238mBqKg, '-o', 'LineWidth', 1.6, DisplayName
 
 grid(ax, 'on');
 xlabel(ax, 'Rok', FontWeight='bold');
-ylabel(ax, 'Stężenie izotopów', rotation=0, FontWeight='bold');
+ylabel(ax, {'Stężenie','izotopów'}, rotation=0, FontWeight='bold');
 title(ax, 'Srednie roczne stężenie promieniotwórcze izotopów w osadach dennych', FontSize=16);
 legend(ax, Location='northwest');
 ax.Units = 'normalized';
@@ -269,7 +269,6 @@ f.Position = [0 500 1200 600];
 f.Visible = "off";
 f.Theme = 'light';
 tiledlayout(2,1, 'TileSpacing', 'compact');
-
 nexttile;
 histogram(data.Cs137WodamBqL, 'NumBins', 20);
 grid on;
@@ -284,12 +283,15 @@ xlabel('Sr-90 w wodzie [mBq/L]', rotation=0, FontWeight='bold');
 ylabel('Liczba pomiarow', FontWeight='bold');
 title('Rozklad Sr-90 w wodzie');
 
+exportgraphics(f, '8.png', BackgroundColor='#f0efe9')
+close(f);
+
 %% Rozklady danych - histogramy (osady)
-f = figure(7);
-f.Position = [0 500 1200 600];
+f = figure(8);
+f.Position = [0 500 1400 600];
 f.Visible = "off";
 f.Theme = 'light';
-tiledlayout(2,1, 'TileSpacing', 'compact');
+tiledlayout(3,1, 'TileSpacing', 'compact');
 
 nexttile;
 histogram(data.Cs137OsadyBqKg, 'NumBins', 20);
@@ -303,152 +305,91 @@ histogram(data.Pu239240mBqKg, 'NumBins', 20);
 grid on;
 xlabel('Pu-239+240 [mBq/kg]', rotation=0, FontWeight='bold');
 ylabel('Liczba pomiarow', FontWeight='bold');
-title('Rozklad Pu-239+240');
+title('Rozklad Pu-239+240 w osadach');
 
-exportgraphics(f, '7.png', BackgroundColor='#f0efe9')
+nexttile;
+histogram(data.Pu239240mBqKg, 'NumBins', 20);
+grid on;
+xlabel('^{238}Pu [mBq/kg]', rotation=0, FontWeight='bold');
+ylabel('Liczba pomiarow', FontWeight='bold');
+title('Rozklad ^{238}Pu w osadach');
+
+exportgraphics(f, '8.png', BackgroundColor='#f0efe9')
 close(f);
 
 %% Macierz korelacji - wykres ciepla
-figure(8);
+f = figure(9);
+f.Position = [0 500 1400 600];
+f.Visible = "off";
+f.Theme = 'light';
 hm = heatmap(analysisVars, analysisVars, R, 'Colormap', parula);
-hm.Title = 'Korelacje Pearsona miedzy wskaznikami';
+hm.Title = 'Współwystępowanie izotopów (Korelacja Pearsona)';
 hm.CellLabelFormat = '%.2f';
 
-% maska istotnosci: p >= 0.05 oznacza brak istotnosci statystycznej
-figure(9);
-imagesc(P >= 0.05);
-colormap(gray);
-colorbar;
-axis equal tight;
-xticks(1:numel(analysisVars)); yticks(1:numel(analysisVars));
-xticklabels(analysisVars); yticklabels(analysisVars);
-xtickangle(30);
-title('Brak istotnosci korelacji (1 = p >= 0.05)');
+exportgraphics(f, '9.png', BackgroundColor='#f0efe9')
+close(f);
 
-%% Wykresy pudełkowe po latach
-figure(10);
-tiledlayout(2,2, 'TileSpacing', 'compact');
+%% Sredni procentowy wklad izotopow w stezenie promieniotworcze (2005 vs 2024)
+f = figure(10);
+f.Position = [0 500 1500 600];
+f.Visible = "off";
+f.Theme = 'light';
 
-rokCat = categorical(data.Rok);
+targetYears = [2005, 2024];
+isotopeVars = {'Cs137OsadyBqKg', 'Pu239240mBqKg', 'Pu238mBqKg', 'Cs137WodamBqL', 'Sr90WodamBqL'};
+isotopeLabels = {'^{137}Cs (osady)', '^{239+240}Pu (osady)', '^{238}Pu (osady)', '^{137}Cs (woda)', '^{90}Sr (woda)'};
 
-nexttile;
-boxchart(rokCat, data.Cs137WodamBqL);
-grid on;
-xlabel('Rok'); ylabel('Cs-137 w wodzie [mBq/L]');
-title('Rozklad Cs-137 w wodzie wg lat');
+tl10 = tiledlayout(1, 2, 'TileSpacing', 'compact', 'Padding', 'compact');
+title(tl10, 'Sredni % wkład izotopów w stężenie promieniotwórcze: 2005 vs 2024', FontSize=14, FontWeight='bold');
 
-nexttile;
-boxchart(rokCat, data.Sr90WodamBqL);
-grid on;
-xlabel('Rok'); ylabel('Sr-90 w wodzie [mBq/L]');
-title('Rozklad Sr-90 w wodzie wg lat');
+for yearIdx = 1:numel(targetYears)
+    y = targetYears(yearIdx);
+    maskYear = data.Rok == y;
 
-nexttile;
-boxchart(rokCat, data.Cs137OsadyBqKg);
-grid on;
-xlabel('Rok'); ylabel('Cs-137 w osadach [Bq/kg]');
-title('Rozklad Cs-137 w osadach wg lat');
+    meanVals = NaN(1, numel(isotopeVars));
+    for varIdx = 1:numel(isotopeVars)
+        meanVals(varIdx) = mean(data.(isotopeVars{varIdx})(maskYear), 'omitnan');
+    end
 
-nexttile;
-boxchart(rokCat, data.Pu239240mBqKg);
-grid on;
-xlabel('Rok'); ylabel('Pu-239+240 osadach [mBq/kg]');
-title('Rozklad Pu-239+240 wg lat');
+    totalVal = sum(meanVals, 'omitnan');
 
-%% Scatter zaleznosci miedzy radionuklidami w wodzie
-figure(11);
-scatter(data.Cs137WodamBqL, data.Sr90WodamBqL, 40, data.Rok, 'filled');
-grid on;
-xlabel('Cs-137 w wodzie [mBq/L]');
-ylabel('Sr-90 w wodzie [mBq/L]');
-title('Zaleznosc Cs-137 vs Sr-90 w wodzie');
-cb = colorbar;
-cb.Label.String = 'Rok';
-
-%% Area chart dla srednich rocznych w wodzie
-figure(12);
-yyaxis left;
-area(roczne.Rok, roczne.mean_Cs137WodamBqL, 'FaceAlpha', 0.45);
-ylabel('Cs-137 w wodzie [mBq/L]');
-
-yyaxis right;
-plot(roczne.Rok, roczne.mean_Sr90WodamBqL, '-o', 'LineWidth', 1.8);
-ylabel('Sr-90 w wodzie [mBq/L]');
-
-grid on;
-xlabel('Rok');
-title('Srednie roczne radionuklidy w wodzie');
-
-%% Heatmapa rok x miejscowosc dla Cs-137 w wodzie
-heatPlaces = unique(data.Miejscowosc, 'stable');
-heatYears = unique(data.Rok);
-heatValues = NaN(numel(heatPlaces), numel(heatYears));
-
-for rowIdx = 1:numel(heatPlaces)
-    for colIdx = 1:numel(heatYears)
-        mask = data.Miejscowosc == heatPlaces(rowIdx) & data.Rok == heatYears(colIdx);
-        if any(mask)
-            heatValues(rowIdx, colIdx) = mean(data.Cs137WodamBqL(mask), 'omitnan');
-        end
+    nexttile;
+    if totalVal > 0
+        pie(meanVals, isotopeLabels);
+        title(sprintf('Rok %d', y), FontSize=13);
+    else
+        text(0.5, 0.5, sprintf('Brak danych dla roku %d', y), ...
+            'HorizontalAlignment', 'center', 'FontSize', 12);
+        axis off;
     end
 end
 
-figure(13);
-hm2 = heatmap(string(heatYears), heatPlaces, heatValues, 'Colormap', hot);
-hm2.Title = 'Cs-137 w wodzie: srednie rok x miejscowosc';
-hm2.XLabel = 'Rok';
-hm2.YLabel = 'Miejscowosc';
-hm2.CellLabelColor = 'none';
+exportgraphics(f, '10.png', BackgroundColor='#f0efe9')
+close(f);
 
-%% Wykres slupkowy pionowy dla najwyzszych srednich Cs-137 w wodzie
-figure(14);
-bar(categorical(topMiasta.Miejscowosc), topMiasta.mean_Cs137WodamBqL, 'FaceColor', [0.20 0.55 0.85]);
+%% Zmiana stezen wszystkich izotopow rok do roku - stacked bary poziome
+f = figure(11);
+f.Position = [0 500 1500 700];
+f.Visible = "off";
+f.Theme = 'light';
+
+stackedData = [ ...
+    roczne.mean_Cs137OsadyBqKg, ...
+    roczne.mean_Pu239240mBqKg, ...
+    roczne.mean_Pu238mBqKg, ...
+    roczne.mean_Cs137WodamBqL, ...
+    roczne.mean_Sr90WodamBqL];
+
+yearCat = categorical(string(roczne.Rok));
+yearCat = reordercats(yearCat, string(roczne.Rok));
+
+barh(yearCat, stackedData, 'stacked');
 grid on;
-xlabel('Miejscowosc');
-ylabel('Srednie Cs-137 w wodzie [mBq/L]');
-title('Top miejscowosci: Cs-137 w wodzie');
-xtickangle(35);
+xlabel('Srednie stezenie izotopow (suma skladowych)', FontWeight='bold');
+ylabel('Rok', rotation=0, FontWeight='bold');
+title('Zmiana stężenia wszystkich izotopów rok do roku (stacked horizontal)', FontSize=15);
+legend({'^{137}Cs (osady)', '^{239+240}Pu (osady)', '^{238}Pu (osady)', '^{137}Cs (woda)', '^{90}Sr (woda)'}, ...
+    Location='eastoutside');
 
-%% Wykres stem dla sredniego Pu-239+240 w osadach
-puMiasta = sortrows(miastaPelne(:, {'Miejscowosc', 'mean_Pu239240mBqKg'}), 'mean_Pu239240mBqKg', 'descend');
-topPu = puMiasta(1:min(12, height(puMiasta)), :);
-
-figure(15);
-stem(topPu.mean_Pu239240mBqKg, 'filled', 'LineWidth', 1.4);
-grid on;
-xlabel('Pozycja w rankingu');
-ylabel('Srednie Pu-239+240 [mBq/kg]');
-title('Ranking miejscowosci: Pu-239+240 w osadach');
-xticks(1:height(topPu));
-xticklabels(cellstr(topPu.Miejscowosc));
-xtickangle(35);
-
-%% Boxplot dla top miejscowosci po Cs-137 w wodzie
-topPlaceNames = topMiasta.Miejscowosc;
-topMask = ismember(data.Miejscowosc, topPlaceNames);
-
-figure(16);
-boxchart(categorical(data.Miejscowosc(topMask), topPlaceNames), data.Cs137WodamBqL(topMask));
-grid on;
-xlabel('Miejscowosc');
-ylabel('Cs-137 w wodzie [mBq/L]');
-title('Rozklad Cs-137 w wodzie dla top miejscowosci');
-xtickangle(35);
-
-%% Druga mapa tematyczna: kolor = Cs-137 w osadach
-figure(17);
-gx3 = geoaxes;
-geoscatter(gx3, mapMiasta.Latitude, mapMiasta.Longitude, 90, mapMiasta.mean_Cs137OsadyBqKg, 'filled');
-title(gx3, 'Mapa tematyczna: Cs-137 w osadach');
-try
-    geobasemap(gx3, 'satellite');
-catch
-    geobasemap(gx3, 'topographic');
-end
-gx3.LatitudeAxis.Visible = 'off';
-gx3.LongitudeAxis.Visible = 'off';
-colormap(gx3, parula);
-cb = colorbar;
-cb.Label.String = 'Srednie Cs-137 w osadach [Bq/kg]';
-geolimits(gx3, [min(mapMiasta.Latitude) - latMargin, max(mapMiasta.Latitude) + latMargin], ...
-    [min(mapMiasta.Longitude) - lonMargin, max(mapMiasta.Longitude) + lonMargin]);
+exportgraphics(f, '11.png', BackgroundColor='#f0efe9')
+close(f);
