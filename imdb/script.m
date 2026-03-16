@@ -1,4 +1,3 @@
-% Kompleksowa analiza IMDb - Każdy wykres w osobnej figurze (11 wykresów)
 clear; clc; close all;
 
 % 1. Ścieżki do plików
@@ -43,24 +42,43 @@ dataAll = dataAll(dataAll.isAdult == 0 | dataAll.isAdult == 1, :);
 moviesOnly = dataAll(dataAll.titleType == "movie", :);
 
 %% Wykresy
-disp('Generowanie wykresów w osobnych oknach...');
+validYears = dataAll.startYear(~isnan(dataAll.startYear) & dataAll.startYear <= 2026);
+movieYears = moviesOnly.startYear(~isnan(moviesOnly.startYear) & moviesOnly.startYear <= 2026);
+fprintf('Produkcje od %i do %i\n', [min(validYears) max(validYears)]);
+fprintf('Filmy od %i do %i\n', [min(movieYears) max(movieYears)]);
+fprintf('Ilość danych %i\n', height(dataAll));
+fprintf('Ilość filmów %i\n', height(moviesOnly));
+fprintf('Kategorie danych %s\n', mat2str(unique(dataAll.titleType)));
 
 % --- WYKRES 1 ---
 figure('Name', '1. Liczba produkcji rocznie');
-validYears = dataAll.startYear(~isnan(dataAll.startYear) & dataAll.startYear <= 2026);
 histogram(validYears, 'BinMethod', 'integers', 'FaceColor', '#0072BD', 'BinWidth', 1);
 title('Liczba wyprodukowanych tytułów rocznie');
 xlabel('Rok'); ylabel('Ilość'); grid on; xlim([1900 2026]);
 
 % --- WYKRES 2 ---
-figure('Name', '2. Rozkład czasu trwania (Filmy)');
+figure('Name', '2. Rozkład czasu trwania (Wszystko)');
+
+validRuntimeIdx = ~isnan(dataAll.runtimeMinutes) & dataAll.runtimeMinutes > 0 & dataAll.runtimeMinutes < 180;
+validRuntimeIdx = validRuntimeIdx & dataAll.titleType ~= 'videoGame' & dataAll.titleType ~= 'tvSeries';
+
+violinplot(categorical(dataAll.titleType(validRuntimeIdx)), dataAll.runtimeMinutes(validRuntimeIdx));
+
+title('Rozkład czasu trwania wg typu produkcji');
+xlabel('Typ produkcji');
+ylabel('Czas trwania');
+grid on;
+ylim([0, 180]);
+
+% --- WYKRES 3 ---
+figure('Name', '3. Rozkład czasu trwania (Filmy)');
 validRuntimes = moviesOnly.runtimeMinutes(~isnan(moviesOnly.runtimeMinutes) & moviesOnly.runtimeMinutes > 30 & moviesOnly.runtimeMinutes < 240);
 histogram(validRuntimes, 'BinWidth', 5, 'FaceColor', '#D95319');
 title('Rozkład czasu trwania filmów');
 xlabel('Czas trwania (minuty)'); ylabel('Częstotliwość'); grid on; xticks(40:5:200); xlim([40 200]);
 
-% --- WYKRES 3 ---
-figure('Name', '3. Średnia ocena filmów w czasie');
+% --- WYKRES 4 ---
+figure('Name', '4. Średnia ocena filmów w czasie');
 yearsUnique = unique(validYears);
 avgRatingYear = arrayfun(@(y) mean(moviesOnly.averageRating(moviesOnly.startYear == y), 'omitnan'), yearsUnique);
 validY_Rating = yearsUnique >= 1920;
@@ -68,48 +86,48 @@ plot(yearsUnique(validY_Rating), avgRatingYear(validY_Rating), '-', 'LineWidth',
 title('Średnia ocena filmów wg roku produkcji');
 xlabel('Rok'); ylabel('Średnia ocena'); grid on; ylim([4.5 7.5]); xlim([1920 2026]);
 
-% --- WYKRES 4 ---
-figure('Name', '4. Oceny: Dla dorosłych vs Reszta');
+% --- WYKRES 5 ---
+figure('Name', '5. Oceny: Dla dorosłych vs Reszta');
 isAdultCat = categorical(dataAll.isAdult, [0 1], {'Dla wszystkich', 'Tylko dla dorosłych (18+)'});
 boxchart(isAdultCat, dataAll.averageRating, 'MarkerStyle', 'none');
 title('Porównanie ocen: Filmy dla dorosłych a reszta');
 ylabel('Ocena IMDb'); grid on;
 
-% --- WYKRES 5 ---
-figure('Name', '5. Oceny wg rodzaju tytułu (TOP 6)');
+% --- WYKRES 6 ---
+figure('Name', '6. Oceny wg rodzaju tytułu');
 [typeCounts, typeNames] = groupcounts(dataAll.titleType);
 [~, sortIdx] = sort(typeCounts, 'descend');
-top6Types = typeNames(sortIdx(1:min(6, length(typeNames))));
+top6Types = typeNames(sortIdx(1:min(10, length(typeNames))));
 typeMask = ismember(dataAll.titleType, top6Types);
-boxchart(categorical(dataAll.titleType(typeMask)), dataAll.averageRating(typeMask), 'MarkerStyle', 'none');
-title('Rozkład ocen dla 6 najpopularniejszych typów produkcji');
+violinplot(categorical(dataAll.titleType(typeMask)), dataAll.averageRating(typeMask));
+title('Rozkład ocen dla typów produkcji');
 ylabel('Ocena IMDb'); grid on;
 
-% --- WYKRES 6 ---
-figure('Name', '6. Liczba Głosów vs Ocena (Skala Log)');
+% --- WYKRES 7 ---
+figure('Name', '7. Liczba Głosów vs Ocena (Skala Log)');
 popData = dataAll(dataAll.numVotes > 1000, :);
 scatter(popData.averageRating, log10(popData.numVotes), 5, 'filled', 'MarkerFaceAlpha', 0.5);
 title('Zależność popularności (liczby głosów) od oceny');
 xlabel('Średnia ocena'); ylabel('Liczba głosów (log10)'); grid on;
 
-% --- WYKRES 7 ---
+% --- WYKRES 8 ---
 % Przetwarzanie odcinków dla seriali
 epStats = groupsummary(episodes, 'parentTconst', 'max', 'seasonNumber');
-figure('Name', '7. Rozkład liczby odcinków w serialach');
+figure('Name', '8. Rozkład liczby odcinków w serialach');
 epCounts = epStats.GroupCount;
 histogram(epCounts(epCounts <= 100), 'BinWidth', 2, 'FaceColor', '#77AC30');
 title('Rozkład całkowitej liczby odcinków w serialach');
 xlabel('Ilość odcinków'); ylabel('Liczba seriali'); grid on; xlim([0, 100]);
 
-% --- WYKRES 8 ---
-figure('Name', '8. Rozkład liczby sezonów w serialach');
+% --- WYKRES 9 ---
+figure('Name', '9. Rozkład liczby sezonów w serialach');
 maxSeasons = epStats.max_seasonNumber;
 histogram(maxSeasons(maxSeasons > 0 & maxSeasons <= 20), 'BinMethod', 'integers', 'FaceColor', '#4DBEEE', 'BinWidth', 1);
 title('Rozkład maksymalnej liczby sezonów w serialach');
-xlabel('Ilość sezonów'); ylabel('Liczba seriali'); grid on; xlim([1, 20]);
+xlabel('Ilość sezonów'); ylabel('Liczba seriali'); grid on; xlim([1, 20]); xticks(1:20);
 
-% --- WYKRES 9 ---
-figure('Name', '9. Top 10 najpopularniejszych gatunków');
+% --- WYKRES 10 ---
+figure('Name', '10. Top 10 najpopularniejszych gatunków');
 genreCounts = tabulate(categorical(dataAll.primaryGenre));
 genreCounts(strcmp(genreCounts(:,1), '<missing>'), :) = [];
 [~, sortIdx] = sort(cell2mat(genreCounts(:,2)), 'descend');
@@ -120,25 +138,40 @@ set(gca, 'YDir', 'reverse');
 title('Top 10 najczęściej występujących gatunków');
 xlabel('Liczba tytułów'); grid on;
 
-% --- WYKRES 10 ---
-figure('Name', '10. Rozkład ocen TOP 10 gatunków');
+% --- WYKRES 11 ---
+figure('Name', '11. Rozkład ocen TOP 10 gatunków');
 genreMask = ismember(dataAll.primaryGenre, string(top10Genres));
 
 catGenres = categorical(dataAll.primaryGenre(genreMask), string(top10Genres));
-boxchart(catGenres, dataAll.averageRating(genreMask), 'BoxFaceColor', '#0072BD', 'MarkerStyle', 'none');
+violinplot(catGenres, dataAll.averageRating(genreMask));
 
 title('Rozkład ocen dla Top 10 najpopularniejszych gatunków');
 xlabel('Gatunek'); 
 ylabel('Ocena IMDb'); 
 grid on;
 
-% --- WYKRES 11: Średni czas trwania filmu rocznie ---
-figure('Name', '11. Średni czas trwania filmu rocznie');
+% --- WYKRES 12 ---
+figure('Name', '12. Średni czas trwania filmu rocznie');
 avgRuntimeYear = arrayfun(@(y) mean(moviesOnly.runtimeMinutes(moviesOnly.startYear == y), 'omitnan'), yearsUnique);
 validY_Runtime = yearsUnique >= 1920 & yearsUnique <= 2026;
 plot(yearsUnique(validY_Runtime), avgRuntimeYear(validY_Runtime), '-', 'LineWidth', 2, 'Color', '#7E2F8E', 'MarkerFaceColor', '#7E2F8E');
 title('Średni czas trwania filmu kinowego na przestrzeni lat');
 xlabel('Rok'); ylabel('Średni czas trwania (minuty)'); grid on; xlim([1920, 2027]); ylim([75, 110]);
+
+% --- WYKRES 13 ---
+figure('Name', '13. Liczba rekordów wg typu');
+
+[typeCounts, typeNames] = groupcounts(dataAll.titleType);
+[typeCountsSorted, sortIdx] = sort(typeCounts, 'descend');
+typeNamesSorted = typeNames(sortIdx);
+
+barh(categorical(typeNamesSorted, typeNamesSorted), typeCountsSorted, 'FaceColor', '#4DBEEE');
+
+title('Liczba rekordów w bazie IMDb wg typu produkcji');
+xlabel('Liczba wystąpień');
+ylabel('Typ produkcji');
+grid on;
+set(gca, 'YDir', 'reverse');
 
 outputFolder = fullfile('imdb', 'plots');
 if ~exist(outputFolder, 'dir')
