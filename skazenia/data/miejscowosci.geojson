@@ -1,0 +1,260 @@
+{
+  "type": "FeatureCollection",
+  "name": "punkty_pomiarowe_szkielet",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "EPSG:4326"
+    }
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 1,
+        "place_name": "Annopol",
+        "latitude": 50.885278,
+        "longitude": 21.856944
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [21.85558, 50.885278]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 2,
+        "place_name": "Chałupki",
+        "latitude": 18.3175,
+        "longitude": 49.925278
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [18.3175, 49.925278]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 3,
+        "place_name": "Drawsko",
+        "latitude": 15.810278,
+        "longitude": 53.530833
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [15.810278, 53.530833]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 4,
+        "place_name": "Głogów",
+        "latitude": 16.081389,
+        "longitude": 51.665
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [16.081389, 51.665]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 5,
+        "place_name": "Kiezmark",
+        "latitude": 18.931111,
+        "longitude": 54.255833,
+        "notes": "Fill coordinates in WGS84"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [18.931111, 54.255833]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 6,
+        "place_name": "Krajnik",
+        "latitude": 14.465556,
+        "longitude": 53.530833,
+        "notes": "Fill coordinates in WGS84"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [14.465556, 53.530833]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 7,
+        "place_name": "Kraków Tyniec",
+        "latitude": 19.809444,
+        "longitude": 50.016111,
+        "notes": "Fill coordinates in WGS84"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [19.809444, 50.016111]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 8,
+        "place_name": "Niesłysz",
+        "latitude": 15.389444,
+        "longitude": 52.236389,
+        "notes": "Fill coordinates in WGS84"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [15.389444, 52.236389]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 9,
+        "place_name": "Płock",
+        "latitude": 19.686667,
+        "longitude": 52.546389,
+        "notes": "Fill coordinates in WGS84"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [19.686667, 52.546389]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 10,
+        "place_name": "Poznań",
+        "latitude": 16.938333,
+        "longitude": 52.410833,
+        "notes": "Fill coordinates in WGS84"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [16.938333, 52.410833]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 11,
+        "place_name": "Pułtusk",
+        "latitude": 21.087222,
+        "longitude": 52.703889,
+        "notes": "Fill coordinates in WGS84"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [21.087222, 52.703889]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 12,
+        "place_name": "Rogóźno",
+        "latitude": 22.974722,
+        "longitude": 51.392222,
+        "notes": "Fill coordinates in WGS84"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [22.974722, 51.392222]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 13,
+        "place_name": "Wadąg",
+        "latitude": 20.523333,
+        "longitude": 53.818333,
+        "notes": "Fill coordinates in WGS84"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [20.523333, 53.818333]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 14,
+        "place_name": "Warszawa",
+        "latitude": 21.011667,
+        "longitude": 52.229722,
+        "notes": "Fill coordinates in WGS84"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [21.011667, 52.229722]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 15,
+        "place_name": "Wielkie Partęczyny",
+        "latitude": 19.405,
+        "longitude": 53.393333,
+        "notes": "Fill coordinates in WGS84"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [19.405, 53.393333]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 16,
+        "place_name": "Wigry",
+        "latitude": 23.080214,
+        "longitude": 54.019267,
+        "notes": "Fill coordinates in WGS84"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [23.080214, 54.019267]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 17,
+        "place_name": "Wrocław",
+        "latitude": 17.038611,
+        "longitude": 51.107778,
+        "notes": "Fill coordinates in WGS84"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [17.038611, 51.107778]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 18,
+        "place_name": "Wyszków",
+        "latitude": 21.451944,
+        "longitude": 52.595833,
+        "notes": "Fill coordinates in WGS84"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [21.451944, 52.595833]
+      }
+    }
+  ]
+}

@@ -1,5 +1,5 @@
 data = readtable('dl.csv', ReadVariableNames=true);
-
+close all;
 disp(head(data))
 
 % Wyciągnięcie samych wylosowanych liczb
@@ -12,18 +12,28 @@ liczba_losowan = size(numery_macierz, 1);
 
 
 %% WIZUALIZACJA 1: Histogram występowania wszystkich liczb (1-49)
-figure(1);
+f = figure(1);
+f.Position = [0 500 1200 600];
 histogram(wszystkie_numery, 'BinEdges', 0.5:1:49.5, 'FaceColor', [0 0.4470 0.7410]);
-title('1. Częstotliwość występowania poszczególnych liczb w Lotto');
-xlabel('Liczba (1-49)');
-ylabel('Ilość losowań');
-xticks(1:2:49); 
+hold on;
+title('Częstotliwość występowania poszczególnych liczb w Lotto', 'FontSize', 16);
+xlabel('Wylosowana liczba', 'FontWeight', 'bold');
+ylabel('Ilość losowań', 'FontWeight', 'bold');
+xticks(1:2:49);
 xlim([0 50]);
 grid on;
 
+E = 6 * liczba_losowan/49;
+
+yline(E, 'r', {'Oczekiwana wartość', ''}, 'LineWidth', 2, 'FontWeight', 'bold')
+hold off;
+
+exportgraphics(f, 'pic1.png', BackgroundColor='#f0efe9')
+
 
 %% WIZUALIZACJA 2: Wykres słupkowy dla 10 najczęściej losowanych liczb
-figure(2);
+f = figure(2);
+f.Position = [0 500 1200 600];
 [zliczenia, ~] = histcounts(wszystkie_numery, 0.5:1:49.5);
 [posortowane_zliczenia, posortowane_indeksy] = sort(zliczenia, 'descend');
 
@@ -32,37 +42,42 @@ top10_liczby = posortowane_indeksy(1:10);
 
 bar(top10_zliczenia, 'FaceColor', [0.8500 0.3250 0.0980]);
 set(gca, 'XTickLabel', top10_liczby);
-title('2. 10 najczęściej losowanych liczb w historii');
-xlabel('Wylosowana liczba');
-ylabel('Liczba wystąpień');
+title('10 najczęściej losowanych liczb w historii', 'FontSize', 16);
+xlabel('Wylosowana liczba', 'FontWeight', 'bold');
+ylabel('Liczba wystąpień', 'FontWeight', 'bold');
 grid on;
+
+exportgraphics(f, 'pic2.png', BackgroundColor='#f0efe9')
 
 
 %% WIZUALIZACJA 3: Rozkład sumy 6 wylosowanych liczb (Krzywa dzwonowa)
-figure(3);
+f = figure(3);
+f.Position = [0 500 1200 600];
 suma_losowan = sum(numery_macierz, 2); 
 
 histogram(suma_losowan, 'BinWidth', 5, 'FaceColor', [0.4660 0.6740 0.1880]);
-title('3. Rozkład sumy 6 wylosowanych liczb');
-xlabel('Suma liczb w jednym losowaniu');
-ylabel('Liczba losowań');
+title('Rozkład sumy 6 wylosowanych liczb', 'FontSize', 16);
+xlabel('Suma liczb w jednym losowaniu', 'FontWeight', 'bold');
+ylabel('Liczba losowań', 'FontWeight', 'bold');
 grid on;
 
-
+exportgraphics(f, 'pic3.png', BackgroundColor='#f0efe9')
 %% WIZUALIZACJA 4: Rozkład ilości liczb parzystych w pojedynczym losowaniu
-figure(4);
+f = figure(4);
+f.Position = [0 500 1200 600];
 parzyste_w_losowaniu = sum(mod(numery_macierz, 2) == 0, 2);
 
 histogram(parzyste_w_losowaniu, 'BinEdges', -0.5:1:6.5, 'FaceColor', [0.9290 0.6940 0.1250]);
-title('4. Ile liczb parzystych wypada w jednym losowaniu?');
-xlabel('Ilość liczb parzystych (od 0 do 6)');
-ylabel('Liczba losowań');
+title('Ile liczb parzystych wypada w jednym losowaniu?', 'FontSize', 16);
+xlabel('Ilość liczb parzystych (od 0 do 6)', 'FontWeight', 'bold');
+ylabel('Liczba losowań', 'FontWeight', 'bold');
 xticks(0:6);
 grid on;
 
-
+exportgraphics(f, 'pic4.png', BackgroundColor='#f0efe9')
 %% WIZUALIZACJA 5: Mapa ciepła (Heatmap) par liczb
-figure(5);
+f = figure(5);
+f.Position = [0 500 1200 600];
 wspolwystepowanie = zeros(49, 49);
 
 
@@ -80,13 +95,16 @@ end
 imagesc(wspolwystepowanie);
 colormap('hot'); 
 colorbar;
-title('5. Mapa ciepła współwystępowania par liczb');
-xlabel('Liczba A');
-ylabel('Liczba B');
+title('Mapa ciepła współwystępowania par liczb', 'FontSize', 16);
+xlabel('Liczba A', 'FontWeight', 'bold');
+ylabel('Liczba B', 'FontWeight', 'bold');
 axis square;
 
+exportgraphics(f, 'pic5.png', BackgroundColor='#f0efe9')
+
 %% WIZUALIZACJA 6: Ile par sąsiadujących liczb występuje w jednym losowaniu?
-figure(6);
+f = figure(6);
+f.Position = [0 500 1200 600];
 kolejne_w_losowaniu = zeros(liczba_losowan, 1);
 
 for i = 1:liczba_losowan
@@ -99,29 +117,29 @@ for i = 1:liczba_losowan
 end
 
 histogram(kolejne_w_losowaniu, 'BinEdges', -0.5:1:5.5, 'FaceColor', [0.4940 0.1840 0.5560]);
-title('6. Występowanie sąsiadujących liczb (np. 14 i 15) w losowaniu');
-xlabel('Ilość par sąsiadujących liczb');
-ylabel('Liczba losowań');
+title('Występowanie sąsiadujących liczb (np. 14 i 15) w losowaniu', 'FontSize', 16);
+xlabel('Ilość par sąsiadujących liczb', 'FontWeight', 'bold');
+ylabel('Liczba losowań', 'FontWeight', 'bold');
 xticks(0:5);
 grid on;
 
-
+exportgraphics(f, 'pic6.png', BackgroundColor='#f0efe9')
 %% WIZUALIZACJA 7: Liczby "Niskie" (1-24) w jednym losowaniu
-figure(7);
-
+f = figure(7);
+f.Position = [0 500 1200 600];
 liczby_niskie = sum(numery_macierz <= 24, 2);
 
 histogram(liczby_niskie, 'BinEdges', -0.5:1:6.5, 'FaceColor', [0.3010 0.7450 0.9330]);
-title('7. Ile liczb z dolnej połowy (1-24) wypada w jednym losowaniu?');
-xlabel('Ilość liczb z przedziału 1-24');
-ylabel('Liczba losowań');
+title('Ile liczb z dolnej połowy (1-24) wypada w jednym losowaniu?', 'FontSize', 16);
+xlabel('Ilość liczb z przedziału 1-24', 'FontWeight', 'bold');
+ylabel('Liczba losowań', 'FontWeight', 'bold');
 xticks(0:6);
 grid on;
 
-
+exportgraphics(f, 'pic7.png', BackgroundColor='#f0efe9')
 %% WIZUALIZACJA 8: Liczby "Zimne" - ile losowań minęło od ostatniego trafienia?
-figure(8);
-
+f = figure(8);
+f.Position = [0 500 1200 600];
 opoznienie_liczb = zeros(1, 49);
 
 for liczba = 1:49
@@ -140,7 +158,17 @@ for liczba = 1:49
 end
 
 bar(1:49, opoznienie_liczb, 'FaceColor', [0.6350 0.0780 0.1840]);
-title('8. Liczby "Zimne": Ile losowań wstecz padła dana liczba po raz ostatni?');
-xlabel('Numer na kuli (1-49)');
-ylabel('Ilość losowań od ostatniego wystąpienia');
+title('Liczby "Zimne": Ile losowań wstecz padła dana liczba po raz ostatni?', 'FontSize', 16);
+xlabel('Numer na kuli (1-49)', 'FontWeight', 'bold');
+ylabel('Ilość losowań od ostatniego wystąpienia', 'FontWeight', 'bold');
 grid on;
+
+exportgraphics(f, 'pic8.png', BackgroundColor='#f0efe9')
+
+%% Chi^2
+[zliczenia, ~] = histcounts(wszystkie_numery, 0.5:1:49.5);
+E = 6*liczba_losowan/49;
+chi2 = sum((zliczenia - E).^2 ./ E);
+disp(chi2)
+p_value = 1 - gammainc(chi2/2, 48/2);
+disp(p_value)
