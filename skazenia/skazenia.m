@@ -264,41 +264,45 @@ exportgraphics(f, '6.png', BackgroundColor='#f0efe9')
 close(f);
 
 %% Rozklady danych - histogramy
-figure(6);
+figure(7);
 tiledlayout(2,2, 'TileSpacing', 'compact');
 
 nexttile;
 histogram(data.Cs137WodamBqL, 'NumBins', 20);
 grid on;
-xlabel('Cs-137 w wodzie [mBq/L]'); ylabel('Liczba pomiarow');
+xlabel('Cs-137 w wodzie [mBq/L]', rotation=0, FontWeight='bold'); 
+ylabel('Liczba pomiarow', FontWeight='bold');
 title('Rozklad Cs-137 w wodzie');
 
 nexttile;
 histogram(data.Sr90WodamBqL, 'NumBins', 20);
 grid on;
-xlabel('Sr-90 w wodzie [mBq/L]'); ylabel('Liczba pomiarow');
+xlabel('Sr-90 w wodzie [mBq/L]', rotation=0, FontWeight='bold');
+ylabel('Liczba pomiarow', FontWeight='bold');
 title('Rozklad Sr-90 w wodzie');
 
 nexttile;
 histogram(data.Cs137OsadyBqKg, 'NumBins', 20);
 grid on;
-xlabel('Cs-137 w osadach [Bq/kg]'); ylabel('Liczba pomiarow');
+xlabel('Cs-137 w osadach [Bq/kg]', rotation=0, FontWeight='bold');
+ylabel('Liczba pomiarow', FontWeight='bold');
 title('Rozklad Cs-137 w osadach');
 
 nexttile;
 histogram(data.Pu239240mBqKg, 'NumBins', 20);
 grid on;
-xlabel('Pu-239+240 [mBq/kg]'); ylabel('Liczba pomiarow');
+xlabel('Pu-239+240 [mBq/kg]', rotation=0, FontWeight='bold');
+ylabel('Liczba pomiarow', FontWeight='bold');
 title('Rozklad Pu-239+240');
 
 %% Macierz korelacji - wykres ciepla
-figure(7);
+figure(8);
 hm = heatmap(analysisVars, analysisVars, R, 'Colormap', parula);
 hm.Title = 'Korelacje Pearsona miedzy wskaznikami';
 hm.CellLabelFormat = '%.2f';
 
 % maska istotnosci: p >= 0.05 oznacza brak istotnosci statystycznej
-figure(8);
+figure(9);
 imagesc(P >= 0.05);
 colormap(gray);
 colorbar;
@@ -335,7 +339,7 @@ title('Rozklad Cs-137 w osadach wg lat');
 nexttile;
 boxchart(rokCat, data.Pu239240mBqKg);
 grid on;
-xlabel('Rok'); ylabel('Pu-239+240 [mBq/kg]');
+xlabel('Rok'); ylabel('Pu-239+240 osadach [mBq/kg]');
 title('Rozklad Pu-239+240 wg lat');
 
 %% Scatter zaleznosci miedzy radionuklidami w wodzie
