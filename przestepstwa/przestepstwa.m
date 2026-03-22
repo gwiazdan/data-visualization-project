@@ -174,7 +174,7 @@ maskStack = dataCount.Nazwa == "POLSKA" & ismember(dataCount.Kategoria, catsStac
 stackData = dataCount(maskStack, {'Rok', 'Kategoria', 'Value'});
 
 yearsStack = unique(stackData.Rok);
-yearsStack = sort(yearsStack);
+yearsStack = sort(yearsStack, 'descend');
 orderedCats = catsStack;
 
 stackVals = zeros(numel(yearsStack), numel(orderedCats));
