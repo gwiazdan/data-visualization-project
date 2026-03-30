@@ -1,0 +1,119 @@
+%% Analiza Hałasu Drogowego 2018-2024 - Wersja V6 (Finalna)
+clear; clc; close all;
+
+selPath = uigetdir(pwd, 'Wybierz folder z plikami CSV');
+if selPath == 0, error('Nie wybrano folderu.'); end
+cd(selPath);
+
+fileNames = {'Wyniki_pomiarow_halasu_drogowego_w_2018_roku.csv', ...
+             'Wyniki_pomiarow_halasu_drogowego_w_2019_roku.csv', ...
+             'Wyniki_pomiarow_halasu_drogowego_w_2020_roku.csv', ...
+             'Wyniki_pomiarow_halasu_drogowego_w_2021_roku.csv', ...
+             'Wyniki_pomiarow_halasu_drogowego_w_2022_roku.csv', ...
+             'Wyniki_pomiarow_halasu_drogowego_w_2023_roku.csv', ...
+             'Wyniki_pomiarow_halasu_drogowego_w_2024_roku.csv'};
+
+dataList = {};
+
+for i = 1:length(fileNames)
+    fname = fileNames{i};
+    if ~isfile(fname), continue; end
+    
+    y = str2double(regexp(fname, '\d{4}', 'match', 'once'));
+    
+    % Import surowy (bez nazw zmiennych, aby uniknąć problemów z nagłówkami)
+    opts = detectImportOptions(fname, 'VariableNamingRule', 'preserve');
+    opts.Encoding = 'UTF-8';
+    if y == 2020, opts.Delimiter = ';'; end
+    
+    T_raw = readtable(fname, opts);
+    vars = T_raw.Properties.VariableNames;
+    
+    % Szukamy indeksów kolumn
+    idxProv = find(contains(vars, 'Wojew', 'IgnoreCase', true), 1);
+    idxNoise = find(contains(vars, 'Laeq', 'IgnoreCase', true), 1);
+    idxTime = find(contains(vars, 'Czas', 'IgnoreCase', true), 1);
+    idxLon = find(contains(vars, 'dł. geogr', 'IgnoreCase', true), 1);
+    idxLat = find(contains(vars, 'szer. geogr', 'IgnoreCase', true), 1);
+    
+    % Pobieranie danych i wymuszanie wektora pionowego
+    try
+        f_prov = string(T_raw{:, idxProv});
+        
+        noiseRaw = T_raw{:, idxNoise};
+        if iscell(noiseRaw) || isstring(noiseRaw)
+            f_noise = str2double(strrep(string(noiseRaw), ',', '.'));
+        else
+            f_noise = double(noiseRaw);
+        end
+        
+        f_time = repmat("Nieokreślony", height(T_raw), 1);
+        if ~isempty(idxTime), f_time = string(T_raw{:, idxTime}); end
+        
+        f_lon = nan(height(T_raw), 1); f_lat = nan(height(T_raw), 1);
+        if ~isempty(idxLon) && ~isempty(idxLat)
+            f_lon = str2double(strrep(string(T_raw{:, idxLon}), ',', '.'));
+            f_lat = str2double(strrep(string(T_raw{:, idxLat}), ',', '.'));
+        end
+        
+        % KLUCZOWY FIX: Upewnienie się, że wszystkie wektory mają tę samą długość
+        n = min([length(f_prov), length(f_noise), length(f_time), length(f_lon)]);
+        
+        T_clean = table();
+        T_clean.Year = repmat(y, n, 1);
+        T_clean.Province = reshape(f_prov(1:n), [], 1);
+        T_clean.NoiseLevel = reshape(f_noise(1:n), [], 1);
+        T_clean.TimePeriod = reshape(f_time(1:n), [], 1);
+        T_clean.Lon = reshape(f_lon(1:n), [], 1);
+        T_clean.Lat = reshape(f_lat(1:n), [], 1);
+        
+        dataList{end+1} = T_clean;
+        fprintf('Załadowano %d\n', y);
+    catch ME
+        fprintf('Błąd w roku %d: %s\n', y, ME.message);
+    end
+end
+
+allData = vertcat(dataList{:});
+allData(isnan(allData.NoiseLevel), :) = [];
+allData.Province = categorical(allData.Province);
+
+%% GENEROWANIE 15 WYKRESÓW
+fprintf('Tworzenie wykresów...\n');
+
+% OKNO 1 (Główne)
+figure('Name','Analiza 1-6','Units','normalized','Position',[0.05 0.5 0.9 0.4]);
+subplot(1,3,1); 
+yAvg = groupsummary(allData, 'Year', 'mean', 'NoiseLevel');
+plot(yAvg.Year, yAvg.mean_NoiseLevel, '-ob', 'LineWidth', 2); title('1. Trend Średni'); grid on;
+subplot(1,3,2);
+histogram(allData.NoiseLevel, 'FaceColor', [0.4 0.6 0.8]); title('2. Rozkład dB');
+subplot(1,3,3);
+boxplot(allData.NoiseLevel, allData.Year); title('3. Boxplot Roczny');
+
+% OKNO 2 (Województwa i Czas)
+figure('Name','Analiza 4-9','Units','normalized','Position',[0.05 0.05 0.9 0.4]);
+subplot(1,3,1);
+pAvg = groupsummary(allData, 'Province', 'mean', 'NoiseLevel'); pAvg = sortrows(pAvg, 'mean_NoiseLevel');
+barh(pAvg.mean_NoiseLevel); set(gca, 'yticklabel', string(pAvg.Province), 'FontSize', 7); title('4. Województwa');
+subplot(1,3,2);
+dayNight = allData(contains(string(allData.TimePeriod), {'Dzień','Noc'}), :);
+if ~isempty(dayNight), boxplot(dayNight.NoiseLevel, dayNight.TimePeriod); end
+title('5. Dzień vs Noc');
+subplot(1,3,3);
+[f, x] = ecdf(allData.NoiseLevel); plot(x, f, 'LineWidth', 2); title('6. CDF'); grid on;
+
+% OKNO 3 (Przestrzeń i Inne)
+figure('Name','Analiza 7-15','Units','normalized','Position',[0.1 0.1 0.8 0.8]);
+subplot(3,3,1); scatter(allData.Lon, allData.Lat, 5, allData.NoiseLevel, 'filled'); title('7. Mapa');
+subplot(3,3,2); bar(unique(allData.Year), groupsummary(allData, 'Year').GroupCount); title('8. Liczba Pomiarów');
+subplot(3,3,3); [d, xi] = ksdensity(allData.NoiseLevel); area(xi, d); title('9. Gęstość');
+subplot(3,3,4); pie([sum(allData.NoiseLevel>65) sum(allData.NoiseLevel<=65)]); title('10. Przekroczenia');
+subplot(3,3,5); hold on; 
+yrs = unique(allData.Year); for k=1:length(yrs), [fi,xi]=ksdensity(allData.NoiseLevel(allData.Year==yrs(k))); plot(xi,fi); end
+title('11. Trendy Gęstości');
+subplot(3,3,6); plot(unique(allData.Year), groupsummary(allData, 'Year', 'max', 'NoiseLevel').max_NoiseLevel, 'r--*'); title('12. Max dB');
+subplot(3,3,7); top3 = groupsummary(allData, 'Province', 'mean', 'NoiseLevel'); top3 = sortrows(top3, 'mean_NoiseLevel', 'descend');
+title('13. Top Województwa'); % uproszczony
+subplot(3,3,8); if ~all(isnan(allData.Lon)), binscatter(allData.Lon, allData.Lat); end; title('14. Heatmapa');
+subplot(3,3,9); pStd = groupsummary(allData, 'Province', 'std', 'NoiseLevel'); bar(pStd.std_NoiseLevel(1:5)); title('15. Zmienność');
